@@ -6,8 +6,8 @@
 <title>NEZA YORK - Apoyito Mutuo</title>
 <style>
   *{box-sizing:border-box}
-  body{margin:0;background:#f6f5f2;color:#1a1a1a;font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
-  #anuncioNeza{display:none;position:fixed;top:0;left:0;right:0;background:#ffeb00;color:#000;padding:12px 12px;text-align:center;font-weight:800;z-index:9999;font-size:12px;border-bottom:3px solid #000;line-height:1.3}
+  body{margin:0;background:#f6f5f2;color:#1a1a1a;font-family:system-ui,sans-serif;min-height:100vh}
+  #anuncioNeza{display:none;position:fixed;top:0;left:0;right:0;background:#ffeb00;color:#000;padding:12px;text-align:center;font-weight:800;z-index:9999;font-size:12px;border-bottom:3px solid #000;line-height:1.3}
   header{padding:24px 20px 10px;text-align:center;padding-top:60px}
   header h1{font-size:28px;margin:0;letter-spacing:-1px}
   header h1 span{background:#ffeb00;padding:2px 8px;border-radius:6px}
@@ -16,7 +16,6 @@
   .card{background:#fff;border:1px solid #e9e6e0;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.04)}
   .label{font-size:11px;font-weight:800;letter-spacing:.8px;color:#999;margin-bottom:8px}
   textarea{width:100%;border:1px solid #e5e2dc;border-radius:12px;padding:12px;font-size:14px;min-height:90px;resize:none;font-family:inherit}
-  textarea:focus{outline:none;border-color:#ffeb00;background:#fffef0}
   button{border:none;border-radius:20px;padding:11px 16px;font-weight:800;font-size:13px;cursor:pointer}
   .primary{background:#111;color:#ffeb00}
   .ghost{background:#f0ede8;color:#555;border:1px solid #e5e2dc}
@@ -29,105 +28,129 @@
 </style>
 </head>
 <body>
-
 <div id="anuncioNeza"></div>
-
 <header>
   <h1>NEZA YORK <span>APOYITO</span></h1>
-  <p>De Neza para Neza. Para cuando no sabes qué decir y sientes que fracasaste como apoyo emocional.</p>
+  <p>De Neza para Neza. Si sientes que fracasaste como apoyo, aquí tienes frases que sí ayudan.</p>
 </header>
-
 <div class="wrap">
   <div class="card">
     <div class="label">1. ¿QUÉ TE CONTARON?</div>
-    <textarea id="input" placeholder="Ej: Me dejó de hablar Monse..."></textarea>
+    <textarea id="input" placeholder="Ej: Me dejaron de hablar..."></textarea>
     <div class="row">
-      <button class="primary" onclick="generar()">Dame ideas para responder</button>
+      <button class="primary" onclick="generar()">Dame ideas 🔔</button>
       <button class="ghost" onclick="limpiar()">Borrar</button>
     </div>
   </div>
   <div class="card" id="result" style="display:none">
-    <div class="neza-badge">RESPUESTAS QUE SÍ AYUDAN</div>
+    <div class="neza-badge">ELIGE UNA - TODAS SUENAN CON TIMBRE</div>
     <div id="respuestas"></div>
   </div>
   <div class="card">
-    <div class="label">FRASES SALVAVIDAS</div>
+    <div class="label">FRASES SALVAVIDAS RÁPIDAS</div>
     <div class="row">
-      <button class="ghost" onclick="copiar('Gracias por contarme esto, sé que no es fácil')">Gracias por contarme</button>
+      <button class="ghost" onclick="copiar('Gracias por contarme esto, sé que no es fácil hablar de eso')">Gracias por contarme</button>
       <button class="ghost" onclick="copiar('Se escucha que te dolió mucho, no es que todo sea tu culpa')">No es tu culpa</button>
-      <button class="ghost" onclick="copiar('¿Quieres que solo te escuche o que pensemos qué hacer?')">¿Escucho o ayudo?</button>
-      <button class="ghost" onclick="copiar('Aquí estoy, aunque no sepa qué decir. No estás sola')">Aquí estoy</button>
+      <button class="ghost" onclick="copiar('¿Quieres que solo te escuche o quieres que pensemos juntas qué hacer?')">¿Escucho o ayudo?</button>
+      <button class="ghost" onclick="copiar('Aquí estoy, aunque no sepa exactamente qué decir. No estás sola en esto')">Aquí estoy</button>
+      <button class="ghost" onclick="copiar('Se vale sentirte así, no tienes que ser fuerte todo el tiempo')">Se vale sentirse así</button>
+      <button class="ghost" onclick="copiar('No tienes que resolverlo hoy, vamos paso a paso')">Paso a paso</button>
     </div>
   </div>
-  <div class="footer">Hecho en Neza York 600 - No somos empresa pero no se necesita ser empresa para ayudar. SAPTEL 800-911-2000</div>
+  <div class="footer">Hecho en Neza York 600 - No somos empresa pero no se necesita ser empresa para ayudar.</div>
 </div>
 
 <script>
 const mensajeNeza = "NezaOfficial: En Neza te ayudamos con problemas que tengas dándote un pequeño apoyo ya que no podemos hacer mucho ya que no somos empresa pero no se necesita ser empresa para poder ayudar. Atte:NezaOfficial";
 
-// SONIDO DING con Web Audio API - no necesita archivo
 let audioCtx;
-function playDing(){
+function playDing(tipo=1){
   try{
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let o = audioCtx.createOscillator();
-    let g = audioCtx.createGain();
-    o.type="sine";
-    o.frequency.value=880; // La
-    g.gain.value=0.15;
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
-    o.stop(audioCtx.currentTime + 0.6);
-    // segundo ding más grave
-    setTimeout(()=>{
-      let o2 = audioCtx.createOscillator();
-      let g2 = audioCtx.createGain();
-      o2.frequency.value=659;
-      g2.gain.value=0.12;
-      o2.connect(g2); g2.connect(audioCtx.destination);
-      o2.start();
-      g2.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
-      o2.stop(audioCtx.currentTime + 0.5);
-    },120);
+    if(tipo===1){ // ding largo para anuncio
+      let o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=880; g.gain.value=0.15;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.6); o.stop(audioCtx.currentTime+0.6);
+      setTimeout(()=>{let o2=audioCtx.createOscillator(), g2=audioCtx.createGain(); o2.frequency.value=659; g2.gain.value=0.12; o2.connect(g2); g2.connect(audioCtx.destination); o2.start(); g2.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.5); o2.stop(audioCtx.currentTime+0.5);},120);
+    } else { // ding cortito para enviar mensaje
+      let o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=1046; g.gain.value=0.18;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.25); o.stop(audioCtx.currentTime+0.25);
+    }
   }catch(e){}
 }
-
 function mostrarAnuncio(){
-  playDing();
+  playDing(1);
   let a=document.getElementById("anuncioNeza");
   a.innerText=mensajeNeza;
   a.style.display="block";
   if(navigator.vibrate) navigator.vibrate([100,50,100]);
   setTimeout(()=>{a.style.display="none";},8000);
 }
-
 setInterval(mostrarAnuncio,60000);
 setTimeout(mostrarAnuncio,5000);
 
-// resto de funciones
+const bancoRespuestas = {
+  amistad: [
+    {t:"Validar amistad", m:"Gracias por contarme lo de Monse. Se nota que valorabas mucho esa amistad y duele que ya no sea la misma. No es que todo sea tu culpa."},
+    {t:"Dar espacio", m:"Si Monse dice que no se siente segura, a veces darle espacio es la mejor forma de respetar la amistad, no significa que seas mala amiga."},
+    {t:"No tomar lados", m:"Cuando a dos amigas les gusta el mismo morro, las dos la pasan mal. No tienes que elegir quién tuvo la culpa para poder apoyar."},
+    {t:"Reparar sin presión", m:"Si quieres hablar con Monse después, podrías decirle 'oye, sé que la cagué o te hice sentir mal, me importa nuestra amistad'. Sin esperar que todo se arregle hoy."}
+  ],
+  culpa: [
+    {t:"Quitar culpa", m:"Se escucha que te estás echando toda la culpa y no todo depende de ti. No es justo que cargues con todo sola."},
+    {t:"Separar culpa", m:"Una cosa es que algo no salió bien y otra es que tú seas mala persona. Puedes haberla cagado en algo y seguir siendo buena amiga."},
+    {t:"Respirar", m:"No tienes que resolver si fue tu culpa ahorita. ¿Qué te haría sentir un poquito más tranquila en este momento?"}
+  ],
+  crush: [
+    {t:"Crush complicado", m:"Está bien culero cuando a ti y a tu amiga les gusta la misma persona. Se vale sentirse celosa, confundida y triste al mismo tiempo."},
+    {t:"No minimizar", m:"No es 'solo un niño', si para ti importaba, importa. No tienes que avergonzarte por sentirte así."}
+  ],
+  general: [
+    {t:"Aquí estoy", m:"Aquí estoy, aunque no sepa exactamente qué decir. No estás sola en esto, we."},
+    {t:"Paso a paso", m:"No tienes que arreglar todo hoy. Vamos paso a paso, ¿qué es lo que más te duele ahorita?"},
+    {t:"Se vale sentir", m:"Se vale sentirte triste, enojada, confundida, todo a la vez. No tienes que ser fuerte todo el tiempo."},
+    {t:"Preguntar qué necesita", m:"¿Quieres que solo te escuche un rato o quieres que pensemos juntas qué puedes hacer? Tú dime qué necesitas."},
+    {t:"Confianza", m:"Gracias por tener la confianza de contarme esto. Eso ya es mucho, no lo tomo a la ligera."},
+    {t:"No estás sola", m:"Aunque sientas que fracasaste como apoyo, el hecho de que estés buscando cómo ayudar ya dice mucho de ti."},
+    {t:"Gatito", m:"Te mando un gatito triste 😿 a veces no hay palabras pero aquí sigo para ti."}
+  ]
+};
+
 function generar(){
   let txt=document.getElementById("input").value.trim();
-  if(!txt){alert("Escribe un poquito");return;}
-  let ideas=[
-    {t:"Validar", m:"Gracias por contarme lo de Monse. Se nota que te importaba mucho su amistad y duele que ya no sea la misma. No todo es tu culpa, cuando a dos les gusta el mismo niño la cosa se pone incómoda para las dos."},
-    {t:"Escuchar", m:"Debe ser bien feo que te digan que todo fue tu culpa. ¿Cómo te has sentido tú con todo esto? No tienes que contar detalles si no quieres."},
-    {t:"Preguntar qué necesita", m:"No tienes que arreglarlo hoy. ¿Quieres que solo te escuche un ratito, o que pensemos qué te haría sentir mejor ahora? Aquí sigo."}
-  ];
+  if(!txt){alert("Escribe algo");return;}
+  playDing(2);
+  let low=txt.toLowerCase();
+  let lista=[];
+  if(low.includes("monse")||low.includes("amiga")||low.includes("amistad")||low.includes("dejo de hablar")) lista=lista.concat(bancoRespuestas.amistad);
+  if(low.includes("culpa")||low.includes("mi culpa")||low.includes("todo es mi")) lista=lista.concat(bancoRespuestas.culpa);
+  if(low.includes("gusta")||low.includes("niño")||low.includes("crush")||low.includes("gustaba")) lista=lista.concat(bancoRespuestas.crush);
+  lista=lista.concat(bancoRespuestas.general);
+  // mezclar y tomar 5
+  lista=lista.sort(()=>0.5-Math.random()).slice(0,6);
   let cont=document.getElementById("respuestas");
   cont.innerHTML="";
-  ideas.forEach(obj=>{
+  lista.forEach(obj=>{
     let d=document.createElement("div");
     d.className="resp";
-    d.innerHTML=`<b>${obj.t}</b>${obj.m}<div class="row"><button class="primary" style="margin-top:8px" onclick="copiar(\`${obj.m.replace(/`/g,"'")}\`)">Copiar</button></div>`;
+    d.innerHTML=`<b>${obj.t}</b>${obj.m}<div class="row"><button class="primary" style="margin-top:8px" onclick="copiar(\`${obj.m.replace(/`/g,"'")}\`)">Copiar y sonar 🔔</button></div>`;
     cont.appendChild(d);
   });
   document.getElementById("result").style.display="block";
 }
-function copiar(t){navigator.clipboard.writeText(t).then(()=>alert("Copiado!")); }
+function copiar(t){
+  playDing(2);
+  navigator.clipboard.writeText(t).then(()=>{ 
+    let a=document.getElementById("anuncioNeza");
+    a.innerText="NezaOfficial: Copiado al portapapeles we ✅";
+    a.style.display="block";
+    setTimeout(()=>{a.style.display="none"; a.innerText=mensajeNeza;},2000);
+  });
+}
 function limpiar(){document.getElementById("input").value="";document.getElementById("result").style.display="none";}
-
-// para que el sonido jale en celular, necesita un primer tap
 document.body.addEventListener('click', ()=>{ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }, {once:true});
 </script>
 </body>
